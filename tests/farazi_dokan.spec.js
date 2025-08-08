@@ -3,7 +3,7 @@ import { SignupPage } from '../pages/SignupPage';
 
 
 test.describe('Farazi Dokan Automation', async () => {
-  test('User sign up successfully test', async ({ page }) => {
+  test('User @signup successfully test', async ({ page }) => {
 
     //Using page object model for signup
     const signupPage = new SignupPage(page);
@@ -17,13 +17,14 @@ test.describe('Farazi Dokan Automation', async () => {
       'Test@1234'
     );
     await signupPage.submitForm();
+    // Validate that the user is signed up successfully
     await signupPage.validateSignupSuccess();
   });
 
-
+  // Test for login and profile update
   test('Login and Profile Update Test', async ({ page }) => {
-    // Navigate to the login page
-    await page.goto('https://farazi.staging.dokandev.com/login');
+
+    await page.goto('https://farazi.staging.dokandev.com/login'); // Navigate to the login page
     // await page.pause();
 
     //login page
@@ -50,9 +51,7 @@ test.describe('Farazi Dokan Automation', async () => {
     await page.getByRole('button', { name: 'Male', exact: true }).click();
     await page.getByRole('button', { name: 'Save Changes' }).click();
 
-
-    // Validate profile update success
-    // Validate by using API response
+    // Validate profile update success by using API response
     const response = await page.waitForResponse(response =>
       response.url().includes('/api/v1/user/my-account/profile') &&
       response.request().method() === 'PATCH' &&
@@ -62,6 +61,41 @@ test.describe('Farazi Dokan Automation', async () => {
     const responseData = await response.json();
     expect(responseData.message).toBe('Profile has been updated successfully!');
     expect(responseData.data.mobile).toBe('01970741571');
+
+  });
+
+
+  //Update address file
+  test.only('Update Address Test', async ({ page }) => {
+
+    await page.goto('https://farazi.staging.dokandev.com/login'); // Navigate to the login page
+
+    //login 
+    await page.getByRole('textbox', { name: 'Email' }).fill('test123@gmail.com');
+    await page.getByRole('textbox', { name: 'Password' }).fill('Test@123');
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+
+    //update address
+    await page.getByRole('link', { name: 'Addresses' }).click();
+    await page.getByRole('button', { name: 'Add New Address' }).click();
+    await page.getByRole('textbox', { name: 'First Name *' }).click();
+    await page.getByRole('textbox', { name: 'First Name *' }).fill('Sakifur');
+    await page.getByRole('textbox', { name: 'Last Name *' }).click();
+    await page.getByRole('textbox', { name: 'Last Name *' }).fill('Rahman');
+    await page.locator('.css-17wv8nz').click();
+    await page.getByRole('option', { name: 'Bangladesh' }).click();
+    await page.getByRole('textbox', { name: 'Enter address' }).click();
+    await page.getByRole('textbox', { name: 'Enter address' }).fill('south banasree');
+    await page.getByText('South Banasree Central Jame MasjidRoad No-12, Dhaka, Bangladesh').click();
+    await page.getByRole('textbox', { name: 'Apartment (Optional)' }).click();
+    await page.getByRole('textbox', { name: 'Apartment (Optional)' }).fill('test');
+    await page.locator('.grid > div > .react-select > .shipping-searchselect > .\\!border-gray-200 > .css-hlgwow > .css-17wv8nz').click();
+    await page.getByRole('textbox', { name: 'Postal Code' }).click();
+    await page.pause();
+    await page.getByRole('textbox', { name: 'Postal Code' }).fill('1219');
+    await page.getByRole('textbox', { name: 'Type a label for effective' }).fill('Home');
+    await page.getByRole('button', { name: 'Save' }).click();
+
 
   });
 
